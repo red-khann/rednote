@@ -30,8 +30,6 @@ const Index: React.FC = () => {
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Chat state
   const [chatView, setChatView] = useState<ChatView>('list');
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
@@ -39,7 +37,6 @@ const Index: React.FC = () => {
     localStorage.setItem('rednote_notes', JSON.stringify(notes));
   }, [notes]);
 
-  // If disguise mode is off and user is authenticated, go straight to chat
   useEffect(() => {
     if (!disguiseMode && user && !loading) {
       setIsSecretUnlocked(true);
@@ -50,9 +47,9 @@ const Index: React.FC = () => {
     if (!noteData.title && !noteData.content) return;
     setNotes(prev => {
       if (noteData.id) {
-        return prev.map(n => n.id === noteData.id ? { ...n, ...noteData } : n);
+        return prev.map(n => n.id === noteData.id ? { ...n, title: noteData.title, content: noteData.content } : n);
       }
-      return [{ id: Date.now().toString(), ...noteData, createdAt: Date.now() }, ...prev];
+      return [{ id: Date.now().toString(), title: noteData.title, content: noteData.content, createdAt: Date.now() }, ...prev];
     });
   };
 
@@ -73,19 +70,14 @@ const Index: React.FC = () => {
     );
   }
 
-  // SECRET LAYER: Chat interface
+  // SECRET LAYER
   if (isSecretUnlocked) {
-    // Need to set up secret pass first
     if (!secretPass) {
       return <SecretPassSetup onComplete={() => {}} />;
     }
-
-    // Need to authenticate
     if (!user) {
       return <Auth />;
     }
-
-    // Chat interface
     return (
       <div className="chat-theme min-h-screen bg-background">
         <div className="max-w-lg mx-auto h-screen">
@@ -109,7 +101,7 @@ const Index: React.FC = () => {
     );
   }
 
-  // NOTES LAYER: Normal notes interface
+  // NOTES LAYER
   if (isEditing) {
     return (
       <div className="max-w-lg mx-auto h-screen">
@@ -126,7 +118,6 @@ const Index: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-lg mx-auto p-4">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-2">
           <h1 className="text-3xl font-bold text-foreground">Notes</h1>
           <button
@@ -137,7 +128,6 @@ const Index: React.FC = () => {
           </button>
         </div>
 
-        {/* Search */}
         <div className="relative mb-5">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
           <input
@@ -149,7 +139,6 @@ const Index: React.FC = () => {
           />
         </div>
 
-        {/* Notes Grid */}
         <div className="space-y-3">
           {filteredNotes.map((note) => (
             <NoteCard

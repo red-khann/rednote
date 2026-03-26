@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
@@ -19,31 +19,40 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete, onBack 
   const [title, setTitle] = useState(note?.title || '');
   const [content, setContent] = useState(note?.content || '');
   const { secretPass, setIsSecretUnlocked } = useApp();
+  const savedRef = useRef(false);
 
-  useEffect(() => {
-    setTitle(note?.title || '');
-    setContent(note?.content || '');
-  }, [note]);
+  const save = () => {
+    if (savedRef.current) return;
+    if (!title.trim() && !content.trim()) return;
+    savedRef.current = true;
+    onSave({ id: note?.id, title: title.trim(), content: content.trim() });
+  };
 
   const handleTitleBlur = () => {
-    // Check if title matches secret pass
-    if (secretPass && title.trim() === secretPass) {
+    const trimmed = title.trim();
+    // If no pass is set yet, typing "#setup" triggers secret pass setup
+    if (!secretPass && trimmed === '#setup') {
       setIsSecretUnlocked(true);
       setTitle('');
       return;
     }
-    handleSave();
+    // If pass is set, typing the pass unlocks the chat
+    if (secretPass && trimmed === secretPass) {
+      setIsSecretUnlocked(true);
+      setTitle('');
+      return;
+    }
   };
 
-  const handleSave = () => {
-    if (!title.trim() && !content.trim()) return;
-    onSave({ id: note?.id, title: title.trim(), content: content.trim() });
+  const handleBack = () => {
+    save();
+    onBack();
   };
 
   return (
     <div className="flex flex-col h-full bg-background">
       <div className="flex items-center justify-between p-4 border-b border-border">
-        <button onClick={() => { handleSave(); onBack(); }} className="text-primary p-1">
+        <button onClick={handleBack} className="text-primary p-1">
           <ArrowLeft size={24} />
         </button>
         {note?.id && (
@@ -68,7 +77,6 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete, onBack 
           placeholder="Start writing..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          onBlur={handleSave}
           className="flex-1 bg-transparent border-none outline-none resize-none text-foreground placeholder:text-muted-foreground/50 leading-relaxed"
         />
       </div>
