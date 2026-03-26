@@ -1,20 +1,26 @@
 import React from 'react';
+import { NOTE_COLORS, NoteColor } from '@/components/NotesSettings';
 
 interface NoteCardProps {
   title: string;
   content: string;
   date: string;
+  color?: NoteColor;
+  fontSize?: string;
   onClick: () => void;
 }
 
-const NoteCard: React.FC<NoteCardProps> = ({ title, content, date, onClick }) => {
+const NoteCard: React.FC<NoteCardProps> = ({ title, content, date, color, fontSize = 'text-sm', onClick }) => {
+  const bgColor = color && color !== 'default' ? NOTE_COLORS[color] : undefined;
+
   return (
     <button
       onClick={onClick}
       className="w-full text-left p-4 bg-card rounded-lg note-shadow hover:scale-[1.02] transition-transform duration-200 border border-border/50"
+      style={bgColor ? { backgroundColor: bgColor } : undefined}
     >
       <h3 className="font-semibold text-card-foreground truncate">{title || 'Untitled'}</h3>
-      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{content || 'No content'}</p>
+      <p className={`text-muted-foreground mt-1 line-clamp-2 ${fontSize}`}>{content || 'No content'}</p>
       <p className="text-xs text-muted-foreground/60 mt-2">{date}</p>
     </button>
   );
