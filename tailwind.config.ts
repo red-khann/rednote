@@ -47,6 +47,17 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        chat: {
+          DEFAULT: "hsl(var(--chat-bg))",
+          foreground: "hsl(var(--chat-fg))",
+          card: "hsl(var(--chat-card))",
+          primary: "hsl(var(--chat-primary))",
+          "primary-foreground": "hsl(var(--chat-primary-fg))",
+          muted: "hsl(var(--chat-muted))",
+          "muted-foreground": "hsl(var(--chat-muted-fg))",
+          border: "hsl(var(--chat-border))",
+          accent: "hsl(var(--chat-accent))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
