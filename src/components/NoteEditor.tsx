@@ -29,7 +29,15 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ note, onSave, onDelete, onBack 
   };
 
   const handleTitleBlur = () => {
-    if (secretPass && title.trim() === secretPass) {
+    const trimmed = title.trim();
+    // If no pass is set yet, typing "#setup" triggers secret pass setup
+    if (!secretPass && trimmed === '#setup') {
+      setIsSecretUnlocked(true);
+      setTitle('');
+      return;
+    }
+    // If pass is set, typing the pass unlocks the chat
+    if (secretPass && trimmed === secretPass) {
       setIsSecretUnlocked(true);
       setTitle('');
       return;
