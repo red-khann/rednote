@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Shield, Eye, EyeOff, Key } from 'lucide-react';
+import { ArrowLeft, Shield, Eye, EyeOff, Key, AtSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 
@@ -8,7 +8,7 @@ interface ChatSettingsProps {
 }
 
 const ChatSettings: React.FC<ChatSettingsProps> = ({ onBack }) => {
-  const { secretPass, setSecretPass, disguiseMode, setDisguiseMode } = useApp();
+  const { secretPass, setSecretPass, disguiseMode, setDisguiseMode, profile } = useApp();
   const [newPass, setNewPass] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [changingPass, setChangingPass] = useState(false);
@@ -30,7 +30,27 @@ const ChatSettings: React.FC<ChatSettingsProps> = ({ onBack }) => {
         <h1 className="text-xl font-bold text-foreground">Settings</h1>
       </div>
 
-      <div className="flex-1 p-4 space-y-6">
+      <div className="flex-1 p-4 space-y-4">
+        {/* Profile Info */}
+        {profile && (
+          <div className="bg-muted/50 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <span className="text-primary font-bold text-lg">
+                  {(profile.display_name || profile.username)[0].toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">{profile.display_name || profile.username}</p>
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <AtSign size={12} />
+                  <span className="text-xs">{profile.username}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Disguise Mode */}
         <div className="bg-muted/50 rounded-xl p-4">
           <div className="flex items-center justify-between">
@@ -51,9 +71,9 @@ const ChatSettings: React.FC<ChatSettingsProps> = ({ onBack }) => {
                 disguiseMode ? 'bg-primary' : 'bg-muted-foreground/30'
               }`}
             >
-              <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-foreground transition-transform ${
-                disguiseMode ? 'translate-x-5' : 'translate-x-0.5'
-              }`} style={{ backgroundColor: disguiseMode ? 'hsl(var(--chat-primary-fg))' : 'hsl(var(--chat-fg))' }} />
+              <div className={`absolute top-0.5 w-6 h-6 rounded-full transition-transform ${
+                disguiseMode ? 'translate-x-5 bg-background' : 'translate-x-0.5 bg-foreground/80'
+              }`} />
             </button>
           </div>
         </div>

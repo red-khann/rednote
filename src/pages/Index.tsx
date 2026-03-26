@@ -3,6 +3,7 @@ import { Plus, Search } from 'lucide-react';
 import NoteCard from '@/components/NoteCard';
 import NoteEditor from '@/components/NoteEditor';
 import SecretPassSetup from '@/components/SecretPassSetup';
+import UsernameSetup from '@/components/UsernameSetup';
 import ChatList from '@/components/ChatList';
 import ChatRoom from '@/components/ChatRoom';
 import ChatSettings from '@/components/ChatSettings';
@@ -19,7 +20,7 @@ interface Note {
 type ChatView = 'list' | 'room' | 'settings';
 
 const Index: React.FC = () => {
-  const { secretPass, isSecretUnlocked, setIsSecretUnlocked, disguiseMode, user, loading } = useApp();
+  const { secretPass, isSecretUnlocked, setIsSecretUnlocked, disguiseMode, user, loading, profile } = useApp();
   const [notes, setNotes] = useState<Note[]>(() => {
     const saved = localStorage.getItem('rednote_notes');
     return saved ? JSON.parse(saved) : [
@@ -31,7 +32,8 @@ const Index: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [chatView, setChatView] = useState<ChatView>('list');
-  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
+  const [activeChatName, setActiveChatName] = useState<string>('');
 
   useEffect(() => {
     localStorage.setItem('rednote_notes', JSON.stringify(notes));
@@ -78,19 +80,28 @@ const Index: React.FC = () => {
     if (!user) {
       return <Auth />;
     }
+    // Need to set username
+    if (!profile) {
+      return <UsernameSetup />;
+    }
     return (
       <div className="chat-theme min-h-screen bg-background">
         <div className="max-w-lg mx-auto h-screen">
           {chatView === 'list' && (
             <ChatList
-              onSelectChat={(id) => { setActiveChatId(id); setChatView('room'); }}
+              onSelectChat={(contactUserId, name) => {
+                setActiveChatUserId(contactUserId);
+                setActiveChatName(name);
+                setChatView('room');
+              }}
               onOpenSettings={() => setChatView('settings')}
             />
           )}
-          {chatView === 'room' && activeChatId && (
+          {chatView === 'room' && activeChatUserId && (
             <ChatRoom
-              chatId={activeChatId}
-              onBack={() => { setChatView('list'); setActiveChatId(null); }}
+              contactUserId={activeChatUserId}
+              contactName={activeChatName}
+              onBack={() => { setChatView('list'); setActiveChatUserId(null); }}
             />
           )}
           {chatView === 'settings' && (
